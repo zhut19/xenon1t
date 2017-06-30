@@ -51,6 +51,7 @@ class OtherLargeS2s(hax.minitrees.TreeMaker):
      - delay_is1: The hit time mean minus main s1 hit time mean
      - delay_is2: The hit time mean minus main s2 hit time mean
      - *interior_split_fraction: Area fraction of the smallest of the two halves considered in the best split inside the peak
+     - *goodness_of_fit: Goodness-of-fit of hitpattern to position provided by PosRecTopPatternFit 
     
     Notes:
      - 'largest' refers to uncorrected area, also excluding main interation peak
@@ -62,7 +63,7 @@ class OtherLargeS2s(hax.minitrees.TreeMaker):
     """
     extra_branches = ['peaks.*']
     peak_name = ['s2_%s_' % order for order in ['1','2','3','4','5']]
-    peak_fields = ['area', 'range_50p_area', 'area_fraction_top', 'x', 'y', 'z', 
+    peak_fields = ['area', 'range_50p_area', 'area_fraction_top', 'x', 'y', 'z', 'goodness_of_fit', 
                    'corrected_area', 'delay_is1', 'delay_is2','interior_split_fraction']
     __version__ = '0.1.1'
     
@@ -92,7 +93,7 @@ class OtherLargeS2s(hax.minitrees.TreeMaker):
                     # Deal with special cases
                     if field == 'range_50p_area':
                         _x = list(peak.range_area_decile)[5]
-                    elif field in ('x', 'y'):
+                    elif field in ('x', 'y', 'goodness_of_fit'):
                         # In case of x and y need to get position from reconstructed_positions
                         for rp in peak.reconstructed_positions:
                             if rp.algorithm == 'PosRecTopPatternFit':
