@@ -20,7 +20,7 @@ class MultipleS2Corrections(TreeMaker):
 
 
 class MultipleS2Peaks(TwoLevelTreeMaker):
-    __version__ = '1.2.0'
+    __version__ = '1.2.1'
     extra_branches = ['peaks.*']
     EventLevelTreeMaker = MultipleS2Corrections
 
@@ -54,17 +54,19 @@ class MultipleS2Peaks(TwoLevelTreeMaker):
 
         df['not_interaction_pattern'] = False
         mask = df.goodness_of_fit_tpf > 0
-        X = np.log10(df.loc[mask, ['area', 'goodness_of_fit_tpf', 's2']])
-        df.loc[mask, 'not_interaction_pattern'] = np.array(
-            self.gmix_pattern.predict(X), bool)
+        if len(df.loc[mask]) > 0:
+            X = np.log10(df.loc[mask, ['area', 'goodness_of_fit_tpf', 's2']])
+            df.loc[mask, 'not_interaction_pattern'] = np.array(
+                self.gmix_pattern.predict(X), bool)
 
         df['not_interaction_width'] = False
         mask = (df.range_50p_area > 0) & (df.z < 0)
-        X = np.column_stack([np.log10(
-            df.loc[mask, 'area']), df.loc[mask, 'range_50p_area']
-            / self.s2_width_model(df.loc[mask, 'z'])])
-        df.loc[mask, 'not_interaction_width'] = np.array(
-            self.gmix_width.predict(X), bool)
+        if len(df.loc[mask]) > 0:
+            X = np.column_stack([np.log10(
+                df.loc[mask, 'area']), df.loc[mask, 'range_50p_area']
+                / self.s2_width_model(df.loc[mask, 'z'])])
+            df.loc[mask, 'not_interaction_width'] = np.array(
+                self.gmix_width.predict(X), bool)
 
         df['not_interaction'] = df.not_interaction_pattern | df.not_interaction_width | df.not_interaction_depth
         return df
